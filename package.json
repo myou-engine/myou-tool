@@ -1,0 +1,32 @@
+{
+  "name": "myou-tool",
+  "version": "1.0.0",
+  "description": "Command line utility for common operations for using the Myou game engine.",
+  "main": "src/",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "./node_modules/coffee-script/bin/coffee -bco build src/*.coffee"
+  },
+  "bin": {
+    "myou-tool": "./bin/myou-tool"
+  },
+  "keywords": [
+    "myou",
+    "engine",
+    "cli",
+    "server",
+    "webpack",
+    "boilerplate"
+  ],
+  "author": "Alberto Torres Ruiz",
+  "license": "MIT",
+  "devDependencies": {
+    "coffee-script": "^1.12.3"
+  },
+  "dependencies": {
+    "follow-redirects": "^1.2.3",
+    "fs-extra": "^2.1.2",
+    "mime": "^1.3.4",
+    "unzip": "^0.1.11"
+  }
+}
