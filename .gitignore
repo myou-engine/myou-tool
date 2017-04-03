@@ -4,6 +4,8 @@
 npm-debug.log
 *~
 Thumbs.db
+.directory
 *.blend1
 *.blend2
 *.bak
+yarn.lock

@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../build/myou-tool.js')
+require(__dirname+'/../build/myou-tool.js')
