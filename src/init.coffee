@@ -13,6 +13,7 @@ init = (args) ->
         'webpack'
         'myou-engine'
     ]
+    console.log "Installing modules..."
     spawnSync 'npm', ['install', '--save'].concat(packages), {stdio: 'inherit', shell: true}
 
     console.log "Copying files of only template currently available: 'simple'"
