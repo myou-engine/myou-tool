@@ -5,14 +5,31 @@ unzip = require 'unzip'
 {https} = require 'follow-redirects'
 {join} = require 'path'
 {spawnSync} = require 'child_process'
-{HOME} = process.env
+
 TEMP = os.tmpdir()
 tmp_zip = join(TEMP, 'tmp_addon.zip')
 unzip_out = join(TEMP, 'myou-blender-plugin-master')
 addon_name = 'myou-blender-plugin-master'
-config_dir = join(HOME, '.config', 'blender')
 
 addon_url = 'https://github.com/myou-engine/myou-blender-plugin/archive/master.zip'
+
+if /^win/.test process.platform
+    get_env = (key) ->
+        key = key.toLowerCase()
+        for k,v of process.env
+            if k.toLowerCase() == key
+                return v
+        return ''
+    config_dir = join(get_env('APPDATA'), 'Blender Foundation', 'Blender')
+    binaries = []
+    # TODO: should we look in other drives?
+    if (program_files = get_env('PROGRAMFILES').replace(/ (x86)$/,''))
+        binaries = [join(program_files, 'Blender Foundation', 'Blender', 'blender.exe'),
+                    join(program_files+' (x86)', 'Blender Foundation', 'Blender', 'blender.exe')]
+else
+    config_dir = join(process.env.HOME, '.config', 'blender')
+    binaries = ['blender']
+    # TODO: Also detect open blender instances
 
 install = (versions=[]) ->
     versions = detect_versions versions
@@ -46,19 +63,21 @@ detect_versions = (versions) ->
         return console.error v+' is not a valid Blender version'
 
     # detect versions from config folders
-    # TODO: find proper paths in windows
     fs.ensureDirSync config_dir
     for v in fs.readdirSync config_dir
-        if /\d\.\d\d/.test(v) and v not in versions
+        if /^\d\.\d\d$/.test(v) and v not in versions
             versions.push v
 
     # detect versions from temp files
-    # TODO: test locked files in windows and ignore them
-    for fname in fs.readdirSync TEMP when /\.blend$/.test fname
+    # TODO: figure out how to get windows' TEMP in cygwin
+    for fname in fs.readdirSync TEMP when (/\.blend$/i).test fname
         buf = new Buffer(12)
-        f = fs.openSync join(TEMP, fname), 'r'
-        fs.readSync f, buf, 0, 12
-        fs.closeSync f
+        try
+            f = fs.openSync join(TEMP, fname), 'r'
+            fs.readSync f, buf, 0, 12
+            fs.closeSync f
+        catch e
+            continue
         head = buf+''
         if /^BLENDER..\d\d\d/.test head
             v = head[9]+'.'+head[10...]
@@ -66,13 +85,13 @@ detect_versions = (versions) ->
                 versions.push v
 
     # detect versions from installed binaries
-    # TODO: find windows binaries in program files
-    s = spawnSync 'blender', ['--version']
-    if not s.error?
-        v = s.stdout[8...12]+''
-        if v not in versions
-            versions.push v
-    return versions
+    for bin in binaries
+        s = spawnSync bin, ['--version']
+        if not s.error?
+            v = s.stdout[8...12]+''
+            if /^\d\.\d\d$/.test(v) and v not in versions
+                versions.push v
+        return versions
 
 copy_files = (versions) ->
     console.log 'Copying files...'
