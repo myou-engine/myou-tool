@@ -12,10 +12,12 @@ install addon   Installs or updates the Blender add-on. If it doesn't find the
                 argument, e.g.:
                     myou-tool install addon 2.78
 
-init            Creates a new myou-engine based project in the current
-                directory. It should either be an empty directory or contain a
-                NPM package with its corresponding package.json.
-                It will show a list of basic templates to choose from.
+init            Creates a new myou-engine based project in the specified
+                directory or the current one. It should either be an empty
+                directory or contain a NPM package with its corresponding
+                package.json. It will show a list of basic templates to choose
+                from. E.g.:
+                    myou-tool init awesome_game
 
 server          Creates a HTTP server for development in the current directory.
                 Optionally you can pass a command and arguments, e.g.:
