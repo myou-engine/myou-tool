@@ -63,7 +63,9 @@ module.exports = {
         extensions: ['.webpack.js', '.web.js', '.js', '.coffee', '.json'],
         alias: {
             // // You can use this to override some packages and use local versions
-            // 'myou-engine': path.resolve(__dirname+'/../myou-engine'),
+            // // Note that we're pointing to pack.coffee to use the source directly
+            // // instead of the precompiled one.
+            // 'myou-engine': path.resolve(__dirname+'/../myou-engine/pack.coffee'),
         },
     },
 }
