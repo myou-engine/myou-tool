@@ -52,6 +52,7 @@ install_packages = (directory) ->
     packages = [
         'myou-engine'
         'webpack'
+        'coffee-script'
         'coffee-loader'
     ]
     process.chdir directory
