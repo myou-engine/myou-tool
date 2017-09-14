@@ -1,11 +1,22 @@
- 
+
 http = require 'http'
 url = require 'url'
 mime = require 'mime'
 stream = require 'stream'
 fs = require 'fs'
+{spawn} = require 'child_process'
 
-server = (callback) ->
+server = (cli_args) ->
+    port = 8000
+    while cli_args[0]?[0] == '-'
+        switch cli_args[0]
+            when '-p'
+                [_, port] = cli_args.splice(0,2)
+                if not (1 <= port <= 65535) # port is coerced to number where needed
+                    return console.error "Invalid port '#{port}'"
+            else
+                return console.error "Unrecognized option: "+cli_args[0]
+
     # This server reads whole files and streams from RAM,
     # to avoid locking files in Windows
     # TODO: Limit by size, and/or detect non-Windows OS
@@ -55,10 +66,15 @@ server = (callback) ->
         bufst.end contents
         bufst.pipe res
 
-    port = 8000
     http_server.listen port, '0.0.0.0', ->
         console.log 'Server created successfully in port: ' + port
-        callback?()
+        console.log 'Open in browser: http://127.0.0.1:'+port
+        [cmd, args...] = cli_args
+        if cmd?
+            console.log "Running", cmd, args.join(' '), '...'
+            p = spawn cmd, args, {stdio: 'inherit', shell: true}
+            p.on 'close', (code) ->
+                console.log "#{cmd} exited with code #{code}"
 
 parse_range = (range, total) ->
     if not range?

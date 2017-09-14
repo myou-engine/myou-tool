@@ -1,8 +1,6 @@
 
-fs = require 'fs'
-{spawn} = require 'child_process'
-
 help_msg = """
+myou-tool 1.1.0
 Usage: myou-tool <command> [options]
 
 Commands:
@@ -22,6 +20,9 @@ init            Creates a new myou-engine based project in the specified
 server          Creates a HTTP server for development in the current directory.
                 Optionally you can pass a command and arguments, e.g.:
                     myou-tool server webpack --watch
+
+                Open in a different port with -p option:
+                    myou-tool server -p 8080 webpack --watch
 
 """
 
@@ -55,13 +56,7 @@ main = ->
             init process.argv[3...]
         when "server", "serve"
             {server} = require './server'
-            server ->
-                [cmd, args...] = process.argv[3...]
-                if cmd?
-                    console.log "Running", cmd, args.join(' '), '...'
-                    p = spawn cmd, args, {stdio: 'inherit', shell: true}
-                    p.on 'close', (code) ->
-                        console.log "#{cmd} exited with code #{code}"
+            server process.argv[3...]
         when undefined
             show_help()
         else
