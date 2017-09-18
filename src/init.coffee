@@ -50,6 +50,7 @@ init = (args) ->
 
 install_packages = (directory) ->
     packages = [
+        'vmath'
         'myou-engine'
         'webpack'
         'coffee-script'
