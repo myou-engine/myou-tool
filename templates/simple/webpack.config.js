@@ -3,7 +3,7 @@
 var webpack = require('webpack');
 var path = require('path');
 
-module.exports = {
+var config = {
     output: {
         path: __dirname + '/build',
         filename: 'app.js',
@@ -22,7 +22,6 @@ module.exports = {
                 test: /\.coffee$/,
                 loaders: [
                     'coffee-loader',
-                    // 'source-map-loader',
                 ]
             },
             {
@@ -37,7 +36,6 @@ module.exports = {
             {test: /\.html$/, loader: 'raw-loader'},
         ]
     },
-    // devtool: 'inline-source-map',
     plugins: [
         /*
         new webpack.BannerPlugin([
@@ -70,3 +68,9 @@ module.exports = {
     },
 }
 
+module.exports = (env={}) => {
+    if(env.sourcemaps){
+        config.devtool = 'cheap-module-eval-source-map';
+    }
+    return config;
+}

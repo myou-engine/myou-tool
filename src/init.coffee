@@ -30,7 +30,7 @@ init = (args) ->
             }
         ], (answers) ->
             answers.main = 'init.coffee'
-            answers.scripts = {start: 'myou-tool serve webpack -w'}
+            answers.scripts = {start: 'myou-tool serve webpack -w --env.sourcemaps'}
             if answers.repository?
                 answers.repository = {type: 'git', url: answers.repository}
             if answers.keywords?
@@ -53,7 +53,7 @@ install_packages = (directory) ->
         'vmath'
         'myou-engine'
         'webpack'
-        'coffee-script'
+        'coffeescript'
         'coffee-loader'
     ]
     process.chdir directory
