@@ -22,6 +22,7 @@ server = (cli_args) ->
     # TODO: Limit by size, and/or detect non-Windows OS
     http_server = http.createServer (req, res) ->
         pathname = decodeURIComponent((url.parse req.url).pathname)
+        console.log req.connection.remoteAddress, pathname
         pathl = []
         for p in pathname[1...].split('/')
             if p == '..'
@@ -110,7 +111,7 @@ make_index = (dir) ->
             icon = '🗎'
             size = stat.size
         """<tr><td style="font-size: 120%; text-align:center;">#{icon}</td>
-            <td><a href="#{esc_html name}">#{esc_html name}</a></td>
+            <td><a href="#{enc_uri name}">#{esc_html name}</a></td>
             <td style="padding: 2px 5px 2px 20px;text-align: right;">#{size}</td>
             <td>#{stat.mtime}</td></tr>"""
     esc_dir = esc_html dir[1...]
@@ -130,5 +131,8 @@ make_index = (dir) ->
 esc_html = (s) ->
     s.replace /[<>&"'`]/gm, (s) ->
         "&##{s.charCodeAt 0};"
+
+enc_uri = (s) ->
+    esc_html encodeURIComponent(s).replace '%2F', '/'
 
 module.exports = {server}
