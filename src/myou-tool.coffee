@@ -1,6 +1,6 @@
 
 help_msg = """
-myou-tool 1.1.0
+myou-tool 1.2.0
 Usage: myou-tool <command> [options]
 
 Commands:

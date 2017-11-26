@@ -1,0 +1,14 @@
+{
+    "main": "init.coffee",
+    "scripts": {
+        "start": "myou-tool serve webpack -w --env.sourcemaps"
+    },
+    "coffeelintConfig": {
+        "indentation": {
+            "value": 4
+        },
+        "no_interpolation_in_single_quotes": {
+            "level": "warn"
+        }
+    }
+}

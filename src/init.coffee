@@ -11,6 +11,7 @@ init = (args) ->
         directory = join directory, args[0]
     dirname = basename directory
     pkg_path = join(directory, 'package.json')
+    template_dir = join(__dirname,'..','templates','simple')
     if not fs.existsSync pkg_path
         console.log """No package.json found. We'll generate one for you.
         See `npm help json` for documentation about fields in package.json."""
@@ -29,12 +30,12 @@ init = (args) ->
                 return spdx or unlicensed or inFile
             }
         ], (answers) ->
-            answers.main = 'init.coffee'
-            answers.scripts = {start: 'myou-tool serve webpack -w --env.sourcemaps'}
             if answers.repository?
                 answers.repository = {type: 'git', url: answers.repository}
             if answers.keywords?
                 answers.keywords = answers.keywords.replace(/[, ]+/g, ' ').split(' ')
+            extra = JSON.parse fs.readFileSync template_dir+'/package.json'
+            answers = Object.assign answers, extra
             pkg = JSON.stringify(answers, null, 2)
             console.log 'About to write to', pkg_path
             console.log pkg, '\n'
@@ -42,13 +43,13 @@ init = (args) ->
                 if answers.ok[0] == 'y'
                     fs.ensureDirSync directory
                     fs.writeFileSync pkg_path, pkg
-                    install_packages(directory)
+                    install_packages(directory, template_dir)
                 else
                     console.error 'Aborted.'
                     process.exit()
-    else install_packages(directory)
+    else install_packages(directory, template_dir)
 
-install_packages = (directory) ->
+install_packages = (directory, template_dir) ->
     packages = [
         'vmath'
         'myou-engine'
@@ -62,12 +63,12 @@ install_packages = (directory) ->
     console.log """If you want to install any other package,
     use `npm install <pkg> --save` to install it and
     save it as a dependency in the package.json file"""
-    copy_template(directory)
+    copy_template(directory, template_dir)
 
 
-copy_template = (directory) ->
+copy_template = (directory, template_dir) ->
     console.log "Copying files of only template currently available: 'simple'"
-    fs.copySync join(__dirname,'..','templates','simple'), directory, {
+    fs.copySync template_dir, directory, {
         filter: (orig, dest) ->
             name = dest[directory.length+1...]
             stat = fs.statSync orig
