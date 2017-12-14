@@ -8,10 +8,10 @@ unzip = require 'unzip'
 
 TEMP = os.tmpdir()
 tmp_zip = join(TEMP, 'tmp_addon.zip')
-unzip_out = join(TEMP, 'myou-blender-plugin-master')
-addon_name = 'myou-blender-plugin-master'
+unzip_out = join(TEMP, 'myou-blender-add-on-master')
+addon_name = 'myou-blender-add-on-master'
 
-addon_url = 'https://github.com/myou-engine/myou-blender-plugin/archive/master.zip'
+addon_url = 'https://github.com/myou-engine/myou-blender-add-on/archive/master.zip'
 
 if /^win/.test process.platform
     get_env = (key) ->
@@ -99,6 +99,11 @@ copy_files = (versions) ->
         dest = join(config_dir, v, 'scripts', 'addons', addon_name)
         fs.ensureDirSync dest
         fs.copySync unzip_out, dest
+        # Remove addon with old repo name
+        old_dest = join(config_dir, v, 'scripts', 'addons', 'myou-blender-plugin-master')
+        if fs.existsSync old_dest
+            fs.removeSync old_dest
+        
 
     console.log 'The addon has been installed for the following Blender versions:'
     console.log versions.join('\n')
