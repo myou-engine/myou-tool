@@ -1,6 +1,8 @@
 
+version = require('../package.json').version
+
 help_msg = """
-myou-tool 1.2.0
+myou-tool #{version}
 Usage: myou-tool <command> [options]
 
 Commands:
