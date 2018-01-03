@@ -29,5 +29,13 @@
     "mime": "^1.3.4",
     "unzip": "^0.1.11",
     "validate-npm-package-license": "^3.0.1"
+  },
+  "coffeelintConfig": {
+    "indentation": {
+      "value": 4
+    },
+    "no_interpolation_in_single_quotes": {
+      "level": "warn"
+    }
   }
 }

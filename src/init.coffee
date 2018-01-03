@@ -33,13 +33,14 @@ init = (args) ->
             if answers.repository?
                 answers.repository = {type: 'git', url: answers.repository}
             if answers.keywords?
-                answers.keywords = answers.keywords.replace(/[, ]+/g, ' ').split(' ')
+                answers.keywords =
+                    answers.keywords.replace(/[, ]+/g, ' ').split(' ')
             extra = JSON.parse fs.readFileSync template_dir+'/package.json'
             answers = Object.assign answers, extra
             pkg = JSON.stringify(answers, null, 2)
             console.log 'About to write to', pkg_path
             console.log pkg, '\n'
-            ask_questions [q: 'Is this ok?', def: 'yes', key: 'ok'], (answers) ->
+            ask_questions [q: 'Is this ok?', def: 'yes', key: 'ok'], (answers)->
                 if answers.ok[0] == 'y'
                     fs.ensureDirSync directory
                     fs.writeFileSync pkg_path, pkg
@@ -58,8 +59,10 @@ install_packages = (directory, template_dir) ->
         'coffee-loader'
     ]
     process.chdir directory
-    console.log "Installing the following modules...", '\n    '+packages.join('\n    ')
-    spawnSync 'npm', ['install', '--save'].concat(packages), {stdio: 'inherit', shell: true}
+    console.log "Installing the following modules...",
+        '\n    '+packages.join('\n    ')
+    spawnSync 'npm', ['install', '--save'].concat(packages),
+        {stdio: 'inherit', shell: true}
     console.log """If you want to install any other package,
     use `npm install <pkg> --save` to install it and
     save it as a dependency in the package.json file"""
@@ -86,7 +89,8 @@ copy_template = (directory, template_dir) ->
 rl = null
 ask_questions = (questions, callback, answers={}, i=0) ->
     if not rl?
-        rl = readline.createInterface input: process.stdin, output: process.stdout
+        {stdin, stdout} = process
+        rl = readline.createInterface input: stdin, output: stdout
     if questions[i]?
         {q, def, key, validate=->true} = questions[i]
         rl.question "#{q} [#{def or ''}] ", (ans) ->

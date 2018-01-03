@@ -12,7 +12,8 @@ server = (cli_args) ->
         switch cli_args[0]
             when '-p'
                 [_, port] = cli_args.splice(0,2)
-                if not (1 <= port <= 65535) # port is coerced to number where needed
+                # port is coerced to number where needed
+                if not (1 <= port <= 65535)
                     return console.error "Invalid port '#{port}'"
             else
                 return console.error "Unrecognized option: "+cli_args[0]
@@ -51,7 +52,8 @@ server = (cli_args) ->
                 console.error e
             headers['Content-Type'] ='text/html'
         if req.headers.range?
-            {start, end, content_range} = parse_range req.headers.range, contents.length
+            {start, end, content_range} =
+                parse_range req.headers.range, contents.length
             contents = contents[start..end] # TODO: do this while reading file
             headers['Content-Range'] = content_range
             headers['Accept-Ranges'] = 'bytes'
@@ -112,7 +114,9 @@ make_index = (dir) ->
             size = stat.size
         """<tr><td style="font-size: 120%; text-align:center;">#{icon}</td>
             <td><a href="#{enc_uri name}">#{esc_html name}</a></td>
-            <td style="padding: 2px 5px 2px 20px;text-align: right;">#{size}</td>
+            <td style="padding: 2px 5px 2px 20px;text-align: right;">
+                #{size}
+            </td>
             <td>#{stat.mtime}</td></tr>"""
     esc_dir = esc_html dir[1...]
     return """<!doctype html>
