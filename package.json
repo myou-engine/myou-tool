@@ -1,6 +1,6 @@
 {
   "name": "myou-tool",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Command line utility for common operations for using the Myou game engine.",
   "main": "src/",
   "scripts": {

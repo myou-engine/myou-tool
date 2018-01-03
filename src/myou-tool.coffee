@@ -26,6 +26,8 @@ server          Creates a HTTP server for development in the current directory.
                 Open in a different port with -p option:
                     myou-tool server -p 8080 webpack --watch
 
+                Serve a different path with the -r option.
+
 """
 
 ###

@@ -5,6 +5,9 @@ mime = require 'mime'
 stream = require 'stream'
 fs = require 'fs'
 {spawn} = require 'child_process'
+path = require 'path'
+
+root_dir = path.resolve './'
 
 server = (cli_args) ->
     port = 8000
@@ -15,6 +18,12 @@ server = (cli_args) ->
                 # port is coerced to number where needed
                 if not (1 <= port <= 65535)
                     return console.error "Invalid port '#{port}'"
+            when '-r'
+                [_, root_dir] = cli_args.splice(0,2)
+                root_dir = path.resolve root_dir
+                stat = fs.existsSync(root_dir) and fs.statSync(root_dir)
+                if not stat.isDirectory?()
+                    throw Error "Invalid root path"
             else
                 return console.error "Unrecognized option: "+cli_args[0]
 
@@ -30,7 +39,7 @@ server = (cli_args) ->
                 pathl.pop()
             else
                 pathl.push p
-        path = './'+pathl.join('/')
+        path = root_dir+'/'+pathl.join('/')
         status = 200
         headers = {}
         contents = ''
