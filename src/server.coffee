@@ -11,6 +11,7 @@ root_dir = path.resolve './'
 
 server = (cli_args) ->
     port = 8000
+    use_put = false
     while cli_args[0]?[0] == '-'
         switch cli_args[0]
             when '-p'
@@ -24,15 +25,21 @@ server = (cli_args) ->
                 stat = fs.existsSync(root_dir) and fs.statSync(root_dir)
                 if not stat.isDirectory?()
                     throw Error "Invalid root path"
+            when '-P', '--put'
+                use_put = true
+                cli_args.shift()
             else
                 return console.error "Unrecognized option: "+cli_args[0]
+
+    url0 = "http://127.0.0.1:#{port}/"
+    url1 = "http://localhost:#{port}/"
 
     # This server reads whole files and streams from RAM,
     # to avoid locking files in Windows
     # TODO: Limit by size, and/or detect non-Windows OS
     http_server = http.createServer (req, res) ->
         pathname = decodeURIComponent((url.parse req.url).pathname)
-        console.log req.connection.remoteAddress, pathname
+        console.log req.connection.remoteAddress, req.method, pathname
         pathl = []
         for p in pathname[1...].split('/')
             if p == '..'
@@ -44,13 +51,23 @@ server = (cli_args) ->
         headers = {}
         contents = ''
         try
-            stat = fs.statSync path
-            if stat.isDirectory() and path[path.length-1] == '/'
-                path += 'index.html'
-                if not fs.existsSync path
-                    contents = make_index path[...-10]
-            contents = contents or fs.readFileSync path
-            headers['Content-Type'] = mime.lookup path
+            switch req.method
+                when 'GET'
+                    stat = fs.statSync path
+                    if stat.isDirectory() and path[path.length-1] == '/'
+                        path += 'index.html'
+                        if not fs.existsSync path
+                            contents = make_index path[...-10]
+                    contents = contents or fs.readFileSync path
+                    headers['Content-Type'] = mime.lookup path
+                when 'PUT'
+                    if use_put and (req.headers.referer.startsWith(url0) or\
+                                    req.headers.referer.startsWith(url1))
+                        console.log 'Trying to write file '+path
+                        req.pipe fs.createWriteStream path, 'utf8'
+                    else
+                        console.log 'Rejecting PUT request'
+                        status = 403
         catch e
             if e.code == 'ENOENT'
                 contents = "<h1>404 File not found</h1>\n"
