@@ -55,8 +55,10 @@ install_packages = (directory, template_dir) ->
         'vmath'
         'myou-engine'
         'webpack'
+        'webpack-cli'
         'coffeescript'
         'coffee-loader'
+        'fs-extra'
     ]
     process.chdir directory
     console.log "Installing the following modules...",

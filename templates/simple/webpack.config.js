@@ -64,9 +64,13 @@ var config = {
             // 'myou-engine': path.resolve(__dirname+'/../myou-engine/pack.coffee'),
         },
     },
+    mode: 'development',
 }
 
 module.exports = (env={}) => {
+    if(env.production){
+        config.mode = 'production';
+    }
     if(env.sourcemaps){
         config.devtool = 'cheap-module-eval-source-map';
     }
