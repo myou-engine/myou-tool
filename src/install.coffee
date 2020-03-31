@@ -1,7 +1,7 @@
 
 fs = require 'fs-extra'
 os = require 'os'
-unzip = require 'unzip'
+unzip = require 'unzipper'
 {https} = require 'follow-redirects'
 {join} = require 'path'
 {spawnSync} = require 'child_process'
