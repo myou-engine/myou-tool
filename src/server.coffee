@@ -51,14 +51,30 @@ server = (cli_args) ->
         headers = {}
         contents = ''
         try
+            # console.log stat
+            # console.log req.headers
+            if req.headers.range?
+                stat = fs.statSync path
+                {start, end, content_range} =
+                    parse_range req.headers.range, stat.size
+                len = end-start+1
+                console.log 'len', len
+                fd = fs.openSync path, 'r'
+                contents = new Buffer len
+                fs.readSync fd, contents, 0, len, start
+                fs.closeSync fd
+                headers['Content-Range'] = content_range
+                headers['Accept-Ranges'] = 'bytes'
+                status = 206
             switch req.method
                 when 'GET'
-                    stat = fs.statSync path
+                    stat ?= fs.statSync path
                     if stat.isDirectory() and path[path.length-1] == '/'
                         path += 'index.html'
                         if not fs.existsSync path
                             contents = make_index path[...-10]
-                    contents = contents or fs.readFileSync path
+                    if not contents
+                        contents = fs.readFileSync path
                     headers['Content-Type'] = mime.lookup path
                 when 'PUT'
                     if use_put and (req.headers.referer.startsWith(url0) or\
@@ -75,21 +91,16 @@ server = (cli_args) ->
             else
                 contents = "<h1>500 Internal server error</h1>\n"
                 status = 500
-                console.error e
+            console.error e.stack
             headers['Content-Type'] ='text/html'
-        if req.headers.range?
-            {start, end, content_range} =
-                parse_range req.headers.range, contents.length
-            contents = contents[start..end] # TODO: do this while reading file
-            headers['Content-Range'] = content_range
-            headers['Accept-Ranges'] = 'bytes'
-            status = 206
         # Disable cache in all ways known to humankind. Probably overkill.
         headers['Expires'] = 'Wed, 21 Oct 2015 07:28:00 GMT'
         headers['Cache-Control'] ='no-cache, no-store, must-revalidate'
         headers['ETag'] = '"'+Math.random()+Math.random()+Math.random()+'"'
         headers['Age'] = 157680000
         headers['Content-Length'] = contents.length
+        headers['Access-Control-Allow-Origin'] = '*'
+        headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD"
         res.writeHead status, headers
         bufst = new stream.PassThrough()
         bufst.end contents
@@ -112,10 +123,10 @@ parse_range = (range, total) ->
     partialstart = parts[0]
     partialend = parts[1]
 
-    start = parseInt(partialstart, 10);
+    start = parseInt partialstart
     end = total-1
     if partialend
-        end = parseInt(partialend, 10)
+        end = parseInt partialend
 
     content_range = 'bytes ' + start + '-' + end + '/' + total
     return {start, end, content_range}
