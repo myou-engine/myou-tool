@@ -29,12 +29,17 @@ var config = {
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,
-                loader: 'url-loader?limit=18000&name=[path][name].[ext]',
+                loader: 'url-loader',
+                options: {limit: 18000, name: '[path][name].[ext]'},
             },
-            {test: /\.svg$/, loader: 'url-loader?mimetype=image/svg+xml'},
-            {test: /\.woff2?$/, loader: 'url-loader?mimetype=application/font-woff'},
-            {test: /\.eot$/, loader: 'url-loader?mimetype=application/font-woff'},
-            {test: /\.ttf$/, loader: 'url-loader?mimetype=application/font-woff'},
+            {test: /\.svg$/, loader: 'url-loader',
+                options:{ mimetype: 'image/svg+xml'}},
+            {test: /\.woff2?$/, loader: 'url-loader',
+                options: {mimetype: 'application/font-woff'}},
+            {test: /\.eot$/, loader: 'url-loader',
+                options: {mimetype: 'application/font-woff'}},
+            {test: /\.ttf$/, loader: 'url-loader',
+                options: {mimetype: 'application/font-woff'}},
             {test: /\.json$/, loader: 'json-loader'},
             {test: /\.html$/, loader: 'raw-loader'},
         ]
@@ -72,7 +77,7 @@ module.exports = (env={}) => {
         config.mode = 'production';
     }
     if(env.sourcemaps){
-        config.devtool = 'cheap-module-eval-source-map';
+        config.devtool = 'cheap-module-source-map';
     }
     if(env.minify || env.uglify){
         config.plugins.push(new webpack.optimize.UglifyJsPlugin({

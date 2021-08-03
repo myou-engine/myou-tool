@@ -1,9 +1,9 @@
 {
     "main": "init.coffee",
     "scripts": {
-        "start": "myou-tool serve webpack -w --env.sourcemaps",
-        "prepare": "webpack --env.production --env.minify",
-        "build": "webpack --env.production --env.minify"
+        "start": "myou-tool serve webpack -w --env sourcemaps",
+        "prepare": "webpack --env production --env minify",
+        "build": "webpack --env production --env minify"
     },
     "coffeelintConfig": {
         "indentation": {
