@@ -28,6 +28,8 @@ server          Creates a HTTP server for development in the current directory.
 
                 Serve a different path with the -r option.
 
+                Add more subpaths with -r web_path=real_path
+
 """
 
 ###

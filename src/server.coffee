@@ -5,9 +5,12 @@ mime = require 'mime'
 stream = require 'stream'
 fs = require 'fs'
 {spawn} = require 'child_process'
-path = require 'path'
+{resolve} = require 'path'
 
-root_dir = path.resolve './'
+routes = {
+    '/': resolve './'
+}
+route_keys = ['/']
 
 server = (cli_args) ->
     port = 8000
@@ -21,15 +24,29 @@ server = (cli_args) ->
                     return console.error "Invalid port '#{port}'"
             when '-r'
                 [_, root_dir] = cli_args.splice(0,2)
-                root_dir = path.resolve root_dir
+                route = '/'
+                eq_pos = root_dir.indexOf('=')
+                if eq_pos != -1
+                    route = root_dir[...eq_pos]
+                    root_dir = root_dir[eq_pos+1...]
+                root_dir = resolve root_dir
                 stat = fs.existsSync(root_dir) and fs.statSync(root_dir)
-                if not stat.isDirectory?()
-                    throw Error "Invalid root path"
+                if route == '/'
+                    if not stat.isDirectory?()
+                        throw Error "Invalid root path: " + root_dir
+                if route[0] != '/'
+                    route = '/'+route
+                if stat.isDirectory?() and not route.endsWith '/'
+                    route += '/'
+                routes[route] = root_dir
             when '-P', '--put'
                 use_put = true
                 cli_args.shift()
             else
                 return console.error "Unrecognized option: "+cli_args[0]
+
+    route_keys = Object.keys routes
+    route_keys.sort (a,b)-> b.length - a.length
 
     url0 = "http://127.0.0.1:#{port}/"
     url1 = "http://localhost:#{port}/"
@@ -46,7 +63,15 @@ server = (cli_args) ->
                 pathl.pop()
             else
                 pathl.push p
-        path = root_dir+'/'+pathl.join('/')
+        path_rel = '/'+pathl.join('/')
+        path = null
+        for k in route_keys
+            console.log 'route',k,path_rel,path_rel.startsWith(k),routes[k]+''
+            if path_rel.startsWith k
+                path = routes[k] + '/' + path_rel[k.length...]
+                break
+        if not path?
+            throw Error "Could not find route, this shouldn't happen"
         status = 200
         headers = {}
         contents = ''
